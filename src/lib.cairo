@@ -47,6 +47,7 @@ impl CoffePriceImpl of PriceTrait{
 
 trait StockCheckTrait {
     fn in_stock(self: @CoffeeType, stock: @Stock) -> bool;
+    fn needed_ingredients(self: @CoffeeType);
 }
 
 impl StockCheckImpl of StockCheckTrait{
@@ -56,12 +57,49 @@ impl StockCheckImpl of StockCheckTrait{
         let milk = *stock.milk;
 
         match self{
-            // Needs at least 25g of coffe beans
+            // Needs at least 25g of coffee beans
             CoffeeType::Americano => beans >= 25,
             // Needs at least 20g of coffee beans and 25ml of milk
-            CoffeeType::Cappucino =>
+            CoffeeType::Cappucino => beans >= 20 && milk >=25,
+            // Needs at least 20g of coffee beans and 50ml of milk
+            CoffeeType::Espresso => beans >= 20 && milk >= 50,
+            // Needs at least 20g of coffee beans and 100ml of milk
+            CoffeeType::Latte => beans >= 20 && milk >=100
         }
     }
 
+    fn needed_ingredients(self: @CoffeeType){
+        match self{
+            CoffeeType::Americano => println!("For Americano we need: 25g of coffee beans."),
+            CoffeeType::Cappucino => println!("For Americano we need: 20g of coffee beans and 25ml of milk."),
+            CoffeeType::Espresso => println!("For Americano we need: 20g of coffee beans and 50ml of milk."),
+            CoffeeType::Latte => println!("For Americano we need: 20g of coffee beans and 100ml of milk.")
+        }
+    }
+}
 
+#[derive(Drop)]
+struct Order{
+    coffee_type: CoffeeType,
+    size: CoffeeSize
+}
+
+fn process_order(order: Order, stock: @Stock){
+    let coffee = @order.coffee_type;
+
+    if StockCheckTrait::in_stock(coffee, stock){
+        let price = PriceTrait::calculate_price(coffee, @order.size);
+        println!("Your coffee is available Total price is: {price}");
+    } else{
+        println!("We are sorry, we don't have enough ingredients for this coffee right now");
+        StockCheckTrait::needed_ingredients(coffee);
+    }
+}
+
+fn main() {
+    let shop_stock = Stock{milk:200, coffee_beans: 400};
+
+    let customer1_order = Order{coffee_type: CoffeeType::Espresso, size:CoffeeSize::Small};
+    println!("Processing your order");
+    process_order(customer1_order, @shop_stock);
 }
