@@ -17,7 +17,9 @@ enum CoffeeSize{
 #[derive(Drop)]
 struct Stock{
     milk: u32,
-    coffee_beans: u32
+    coffee_beans: u32,
+    sugar: u32,
+    hot_water: u32
 }
 
 trait PriceTrait{
@@ -55,16 +57,18 @@ impl StockCheckImpl of StockCheckTrait{
         // * is used to get the real value
         let beans = *stock.coffee_beans;
         let milk = *stock.milk;
+        let sugar = *stock.sugar;
+        let water = *stock.hot_water;
 
         match self{
             // Needs at least 25g of coffee beans
-            CoffeeType::Americano => beans >= 25,
+            CoffeeType::Americano => beans >= 25 && sugar >= 15 && water >= 50,
             // Needs at least 20g of coffee beans and 25ml of milk
-            CoffeeType::Cappucino => beans >= 20 && milk >=25,
+            CoffeeType::Cappucino => beans >= 20 && milk >=25 && sugar >= 15 && water >= 50,
             // Needs at least 20g of coffee beans and 50ml of milk
-            CoffeeType::Espresso => beans >= 20 && milk >= 50,
+            CoffeeType::Espresso => beans >= 20 && milk >= 50 && sugar >= 15 && water >= 50,
             // Needs at least 20g of coffee beans and 100ml of milk
-            CoffeeType::Latte => beans >= 20 && milk >=100
+            CoffeeType::Latte => beans >= 20 && milk >=100 && sugar >= 15 && water >= 50
         }
     }
 
@@ -97,7 +101,7 @@ fn process_order(order: Order, stock: @Stock){
 }
 
 fn main() {
-    let shop_stock = Stock{milk:200, coffee_beans: 400};
+    let shop_stock = Stock{milk:200, coffee_beans: 400, hot_water: 1000, sugar: 3000};
 
     let customer1_order = Order{coffee_type: CoffeeType::Espresso, size:CoffeeSize::Small};
     println!("Processing your order");
